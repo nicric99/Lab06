@@ -8,10 +8,10 @@ public class Rilevamento {
 	private Date data;
 	private int umidita;
 
-	public Rilevamento(String localita, Date data, int umidita) {
+	public Rilevamento(String localita, Date data, int d) {
 		this.localita = localita;
 		this.data = data;
-		this.umidita = umidita;
+		this.umidita = d;
 	}
 
 	public String getLocalita() {
