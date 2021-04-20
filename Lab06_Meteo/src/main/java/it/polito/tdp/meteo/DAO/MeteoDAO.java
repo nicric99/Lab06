@@ -1,14 +1,18 @@
 package it.polito.tdp.meteo.DAO;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import it.polito.tdp.meteo.model.Citta;
 import it.polito.tdp.meteo.model.Rilevamento;
 
 public class MeteoDAO {
@@ -26,8 +30,10 @@ public class MeteoDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
+				Date data=rs.getDate("Data");
+				LocalDate dataj= data.toLocalDate();
 
-				Rilevamento r = new Rilevamento(rs.getString("Localita"), rs.getDate("Data"), rs.getInt("Umidita"));
+				Rilevamento r = new Rilevamento(rs.getString("Localita"), dataj, rs.getInt("Umidita"));
 				rilevamenti.add(r);
 			}
 
@@ -67,6 +73,71 @@ public class MeteoDAO {
 
 			conn.close();
 			return risultato;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+	}
+	public List<Rilevamento> getRilevamentoByGiorno(int mese,int giorno){
+		final String sql= "SELECT situazione.Localita,situazione.`Data`,situazione.Umidita "+
+				 "FROM situazione "+
+				 "WHERE MONTH(situazione.data)=? AND DAY(situazione.`Data`)=? ";
+		List<Rilevamento> risultato= new ArrayList<Rilevamento>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, mese);
+			st.setInt(2, giorno);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				LocalDate d1=rs.getDate("Data").toLocalDate();
+				risultato.add(new Rilevamento(rs.getString("Localita"),d1,rs.getInt("Umidita")));
+			}
+
+			conn.close();
+			return risultato;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		
+		
+	}
+	
+	
+	
+	
+	public HashSet<Citta> getCitta(){
+		
+		final String sql= "SELECT DISTINCT "
+				+ "situazione.Localita "
+				+ "FROM situazione ";
+		
+		HashSet<Citta> citta= new HashSet<Citta>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				
+				Citta local= new Citta(rs.getString("Localita"));
+				citta.add(local);
+			}
+
+			conn.close();
+			return citta;
 
 		} catch (SQLException e) {
 

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.meteo.model.Model;
+import it.polito.tdp.meteo.model.Rilevamento;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -43,14 +44,40 @@ public class FXMLController {
 
     @FXML
     void doCalcolaSequenza(ActionEvent event) {
-
-    }
+    	txtResult.clear();
+    	int mese= 0;
+    	try {
+    	 mese = boxMese.getValue();
+    	}catch(NullPointerException npe) {
+    		txtResult.setText("Errore inserire un mese nella choicebox");
+    		return;
+    	}
+    	List<Rilevamento> a= new ArrayList<Rilevamento>();
+    	long  start=System.currentTimeMillis();
+    	a=model.trovaSequenza(mese);
+    	long  finish=System.currentTimeMillis();
+    	txtResult.appendText("Il tempo è "+(finish-start)+"ms"+"\n");
+		String risultato= "";
+		for(Rilevamento r:a) {
+			String s="";
+			s=s+r.toString()+"\n";
+			txtResult.appendText(s);
+		}
+		System.out.println(risultato);
+	}
+ 
 
     @FXML
     void doCalcolaUmidita(ActionEvent event) {
     	// mettere il controllo utente 
     	txtResult.clear();
-    	int mese = boxMese.getValue();
+    	int mese= 0;
+    	try {
+    	 mese = boxMese.getValue();
+    	}catch(NullPointerException npe) {
+    		txtResult.setText("Errore inserire un mese nella choicebox");
+    		return;
+    	}
     	Map<String,Double> risultato= new HashMap<String,Double>();
     	risultato=model.getUmiditaMedia(mese);
     	for(String s: risultato.keySet()) {
