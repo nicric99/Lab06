@@ -112,6 +112,36 @@ public class MeteoDAO {
 		
 		
 	}
+	public Rilevamento getSingoloRilevamento(int mese,int giorno,String citta){
+		
+		// PROVA OTTIMIZZAZIONE
+		final String sql= "SELECT situazione.Localita,situazione.`Data`,situazione.Umidita "+
+				 "FROM situazione "+
+				 "WHERE MONTH(situazione.data)=? AND DAY(situazione.`Data`)=? AND situazione.Localita=? ";
+		List<Rilevamento> risultato= new ArrayList<Rilevamento>();
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setInt(1, mese);
+			st.setInt(2, giorno);
+			st.setString(3,citta);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				LocalDate d1=rs.getDate("Data").toLocalDate();
+				return new Rilevamento(rs.getString("Localita"),d1,rs.getInt("Umidita"));
+			}
+
+			conn.close();
+			return null;
+
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+			throw new RuntimeException(e);
+	}}
 	
 	
 	

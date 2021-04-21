@@ -33,6 +33,7 @@ public class Model {
 		List<Rilevamento> parziale= new ArrayList<Rilevamento>();
 		
 		cerca1(parziale,1,mese);
+		// qui completo la soluzione
 		
 		return this.risultato;
 	}
@@ -57,14 +58,37 @@ public class Model {
 			return;
 			}
 		}
-		
-		// qua sviluppo la query che andrà su meteo dao
-		List<Rilevamento> temp= new ArrayList<Rilevamento>();
+		//originale
+		/*List<Rilevamento> temp= new ArrayList<Rilevamento>();
 		temp=md.getRilevamentoByGiorno(mese, livello);
 		for(Rilevamento r:temp) {
 			parziale.add(r);
 			cerca1(parziale,livello+1,mese);
 			parziale.remove(r);
+		}*/
+		
+		// qua sviluppo la query che andrà su meteo dao e questa è la soluzione bruta
+		List<Rilevamento> temp= new ArrayList<Rilevamento>();
+		temp=md.getRilevamentoByGiorno(mese, livello);
+		for(Rilevamento r:temp) {
+			parziale.add(r);
+			if(livello==1) {
+				Rilevamento r1;
+				Rilevamento r2;
+				// ipotizziamo un singolo rilevamento per citta per giorno
+				r1=md.getSingoloRilevamento(mese, livello+1,r.getLocalita());
+				r2=md.getSingoloRilevamento(mese, livello+2,r.getLocalita());
+				if(r1.getUmidita()!=0 && r2.getUmidita()!=0) {
+				parziale.add(r1);
+				parziale.add(r2);
+				cerca1(parziale,livello+3,mese);
+				parziale.remove(r2);
+				parziale.remove(r1);}
+			}else {
+			cerca1(parziale,livello+1,mese);
+			parziale.remove(r);
+			}
+			
 		}
 		
 		
